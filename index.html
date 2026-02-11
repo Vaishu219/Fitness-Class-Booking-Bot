@@ -1,137 +1,1521 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Fitness Class Booking Bot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitLife Gym - Smart Booking Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    <style>
+        :root {
+            /* Modern Color Theme */
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --secondary: #764ba2;
+            --accent: #f5576c;
+            --success: #00d4aa;
 
-    .chatbot {
-        width: 400px;
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
+            --bg-primary: #0f0f1e;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #252541;
+            --bg-card: #ffffff;
 
-    .header {
-        background: #6a11cb;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-    }
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --text-light: #b2bec3;
+            --text-white: #ffffff;
 
-    .chat {
-        height: 320px;
-        padding: 15px;
-        overflow-y: auto;
-        background: #f5f5f5;
-    }
+            --border: #e0e0e0;
+            --border-dark: #2d2d44;
 
-    .bot, .user {
-        margin-bottom: 10px;
-        padding: 8px 12px;
-        border-radius: 8px;
-        max-width: 80%;
-        font-size: 14px;
-    }
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
 
-    .bot {
-        background: #e0d4ff;
-        align-self: flex-start;
-    }
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
 
-    .user {
-        background: #c8e6c9;
-        margin-left: auto;
-        text-align: right;
-    }
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
 
-    .input-area {
-        display: flex;
-        border-top: 1px solid #ccc;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .input-area input {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        outline: none;
-        font-size: 14px;
-    }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-    .input-area button {
-        background: #6a11cb;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        cursor: pointer;
-    }
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
 
-    .input-area button:hover {
-        background: #4b0fa3;
-    }
-</style>
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-primary);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .user-info h3 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 24px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--text-white);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-white);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-dark);
+        }
+
+        .upgrade-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 16px;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .upgrade-card h4 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .upgrade-card p {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .upgrade-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f5f7fa;
+            padding: 10px 16px;
+            border-radius: 20px;
+            min-width: 280px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: #f5f7fa;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-btn:hover {
+            background: #e8ecf1;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+            background: #f5f7fa;
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        /* Page Content */
+        .page-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chat Page */
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+            height: calc(100vh - var(--header-height) - 64px);
+        }
+
+        .chat-main {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .bot-message {
+            display: flex;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .bot-text {
+            background: #f5f7fa;
+            padding: 14px 18px;
+            border-radius: 16px 16px 16px 4px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line;
+            color: var(--text-primary);
+        }
+
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .user-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 14px 18px;
+            border-radius: 16px 16px 4px 16px;
+            max-width: 70%;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .typing-indicator {
+            display: none;
+            margin-bottom: 16px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+            gap: 12px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 14px 18px;
+            background: #f5f7fa;
+            border-radius: 16px;
+            margin-left: 52px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Chat Sidebar */
+        .chat-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .quick-actions-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-actions-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .quick-action-btn {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f5f7fa;
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-action-btn:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: white;
+        }
+
+        .stats-card h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Classes Grid */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .class-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .class-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .class-emoji {
+            font-size: 32px;
+        }
+
+        .class-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .difficulty-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .difficulty-beginner {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-intermediate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-advanced {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .class-info {
+            margin: 16px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .class-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .capacity-bar {
+            width: 100%;
+            height: 8px;
+            background: #f5f7fa;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0 8px;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        .trainer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        .trainer-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .trainer-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .trainer-rating {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Trainers Grid */
+        .trainers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .trainer-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .trainer-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .trainer-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .trainer-card-avatar {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .trainer-card-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .trainer-card-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .trainer-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+            padding: 16px;
+            background: #f5f7fa;
+            border-radius: var(--radius-md);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .certifications {
+            margin-top: 16px;
+        }
+
+        .cert-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #f5f7fa;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 4px 4px 4px 0;
+        }
+
+        /* Membership Page */
+        .membership-container {
+            max-width: 1000px;
+        }
+
+        .current-plan-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .current-plan-card h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .current-plan-card p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .plan-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .plan-stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: var(--radius-md);
+        }
+
+        .plan-stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .plan-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .plan-card.featured {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+        }
+
+        .plan-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            font-size: 40px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .plan-price span {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .plan-features {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .plan-features li {
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .chat-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-sidebar {
+                display: none;
+            }
+
+            .search-bar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .header {
+                padding: 0 16px;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .classes-grid,
+            .trainers-grid,
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h2 {
+                font-size: 20px;
+            }
+
+            .chat-layout {
+                height: calc(100vh - var(--header-height) - 32px);
+            }
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="chatbot">
-    <div class="header">🏋️ Fitness Class Booking Bot</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🏋️</div>
+                    <div class="logo-text">
+                        <h1>FitLife Gym</h1>
+                        <p>Smart Assistant</p>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-info">
+                        <h3>Alex Johnson</h3>
+                        <p>Premium Member</p>
+                    </div>
+                </div>
+            </div>
 
-    <div class="chat" id="chat">
-        <div class="bot">Hello! Welcome to FitLife Gym 💪</div>
-        <div class="bot">Available classes: Yoga, Zumba, Cardio</div>
+            <div class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-label">Main</div>
+                    <div class="nav-item active" onclick="navigateTo('chat')">
+                        <span class="nav-icon">💬</span>
+                        <span>Chat Assistant</span>
+                    </div>
+                    <div class="nav-item" onclick="navigateTo('classes')">
+                        <span class="nav-icon">📋</span>
+                        <span>Classes</span>
+                    </div>
+                    <div class="nav-item" onclick="navigateTo('trainers')">
+                        <span class="nav-icon">👨‍🏫</span>
+                        <span>Trainers</span>
+                    </div>
+                    <div class="nav-item" onclick="navigateTo('membership')">
+                        <span class="nav-icon">💳</span>
+                        <span>Membership</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-label">Account</div>
+                    <div class="nav-item" onclick="alert('Bookings feature coming soon!')">
+                        <span class="nav-icon">📅</span>
+                        <span>My Bookings</span>
+                    </div>
+                    <div class="nav-item" onclick="alert('Settings feature coming soon!')">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="upgrade-card">
+                    <h4>Upgrade to VIP</h4>
+                    <p>Unlimited bookings & exclusive classes</p>
+                    <button class="upgrade-btn">Upgrade Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                    <div class="page-title">
+                        <h2 id="pageTitle">Chat Assistant</h2>
+                        <p id="pageSubtitle">Ask me anything about classes, trainers, or bookings</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search classes, trainers...">
+                    </div>
+                    <button class="notification-btn">
+                        🔔
+                        <span class="notification-badge"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Chat Page -->
+                <div id="chatPage" class="page-content active">
+                    <div class="chat-layout">
+                        <div class="chat-main">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="message bot-message">
+                                    <div class="bot-avatar">🤖</div>
+                                    <div class="bot-text">Hello Alex! 👋 Welcome to FitLife Gym 💪
+
+                                        Available classes: Yoga, Zumba, Cardio Blast, Pilates, HIIT Training, Spinning
+
+                                        You can also ask about trainers, membership, or booking history!</div>
+                                </div>
+                            </div>
+
+                            <div class="typing-indicator" id="typingIndicator">
+                                <div class="typing-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+
+                            <div class="chat-input">
+                                <div class="input-wrapper">
+                                    <input type="text" id="userInput" placeholder="Type your message..."
+                                        autocomplete="off">
+                                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-sidebar">
+                            <div class="quick-actions-card">
+                                <h3>Quick Actions</h3>
+                                <button class="quick-action-btn" onclick="quickAction('classes')">📋 View All
+                                    Classes</button>
+                                <button class="quick-action-btn" onclick="quickAction('trainers')">👨‍🏫 Meet
+                                    Trainers</button>
+                                <button class="quick-action-btn" onclick="quickAction('membership')">💳 Check
+                                    Membership</button>
+                                <button class="quick-action-btn" onclick="quickAction('history')">📅 My
+                                    Bookings</button>
+                            </div>
+
+                            <div class="stats-card">
+                                <h3>Your Stats</h3>
+                                <div class="stat-item">
+                                    <span class="stat-label">Bookings Used</span>
+                                    <span class="stat-value">3 / 15</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Classes Attended</span>
+                                    <span class="stat-value">12</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Favorite Class</span>
+                                    <span class="stat-value">Yoga 🧘</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classes Page -->
+                <div id="classesPage" class="page-content">
+                    <div class="classes-grid" id="classesGrid"></div>
+                </div>
+
+                <!-- Trainers Page -->
+                <div id="trainersPage" class="page-content">
+                    <div class="trainers-grid" id="trainersGrid"></div>
+                </div>
+
+                <!-- Membership Page -->
+                <div id="membershipPage" class="page-content">
+                    <div class="membership-container">
+                        <div class="current-plan-card">
+                            <h2>Your Current Plan: Premium</h2>
+                            <p>Enjoy priority booking and access to all classes!</p>
+                            <div class="plan-stats-grid">
+                                <div class="plan-stat-card">
+                                    <div class="plan-stat-label">Bookings Used</div>
+                                    <div class="plan-stat-value">3 / 15</div>
+                                </div>
+                                <div class="plan-stat-card">
+                                    <div class="plan-stat-label">Remaining</div>
+                                    <div class="plan-stat-value">12</div>
+                                </div>
+                                <div class="plan-stat-card">
+                                    <div class="plan-stat-label">Priority Booking</div>
+                                    <div class="plan-stat-value">✓ Yes</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="plans-grid">
+                            <div class="plan-card">
+                                <div class="plan-name">Basic</div>
+                                <div class="plan-price">$29<span>/mo</span></div>
+                                <ul class="plan-features">
+                                    <li>5 bookings per month</li>
+                                    <li>Standard classes access</li>
+                                    <li>Mobile app access</li>
+                                    <li>Email support</li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-card featured">
+                                <div class="featured-badge">Popular</div>
+                                <div class="plan-name">Premium</div>
+                                <div class="plan-price">$59<span>/mo</span></div>
+                                <ul class="plan-features">
+                                    <li>15 bookings per month</li>
+                                    <li>All classes access</li>
+                                    <li>Priority booking</li>
+                                    <li>Mobile app access</li>
+                                    <li>Priority support</li>
+                                </ul>
+                            </div>
+
+                            <div class="plan-card">
+                                <div class="plan-name">VIP</div>
+                                <div class="plan-price">$99<span>/mo</span></div>
+                                <ul class="plan-features">
+                                    <li>Unlimited bookings</li>
+                                    <li>All classes + exclusive</li>
+                                    <li>Priority booking</li>
+                                    <li>Personal trainer sessions</li>
+                                    <li>24/7 premium support</li>
+                                    <li>Free merchandise</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="input" placeholder="Type here..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
+    <script>
+        // Data
+        const classesData = {
+            yoga: { name: "Yoga", timings: ["6 AM", "7 AM", "6 PM", "7 PM"], days: ["Mon", "Wed", "Fri", "Sat"], duration: "60 min", difficulty: "Beginner", capacity: 20, enrolled: 12, trainer: "Sarah Johnson", emoji: "🧘" },
+            zumba: { name: "Zumba", timings: ["8 AM", "7 PM", "8 PM"], days: ["Tue", "Thu", "Sat"], duration: "45 min", difficulty: "Intermediate", capacity: 25, enrolled: 18, trainer: "Maria Garcia", emoji: "💃" },
+            cardio: { name: "Cardio Blast", timings: ["6 AM", "5 PM", "6 PM"], days: ["Mon", "Wed", "Fri"], duration: "45 min", difficulty: "Advanced", capacity: 15, enrolled: 10, trainer: "Mike Chen", emoji: "🏃" },
+            pilates: { name: "Pilates", timings: ["9 AM", "5 PM"], days: ["Tue", "Thu", "Sun"], duration: "60 min", difficulty: "Beginner", capacity: 15, enrolled: 8, trainer: "Emma Wilson", emoji: "🤸" },
+            hiit: { name: "HIIT Training", timings: ["7 AM", "6 PM"], days: ["Mon", "Wed", "Fri"], duration: "30 min", difficulty: "Advanced", capacity: 12, enrolled: 11, trainer: "Jake Thompson", emoji: "💪" },
+            spinning: { name: "Spinning", timings: ["6 AM", "7 AM", "7 PM"], days: ["Tue", "Thu", "Sat"], duration: "45 min", difficulty: "Intermediate", capacity: 20, enrolled: 15, trainer: "Lisa Park", emoji: "🚴" }
+        };
 
-<script>
-    let selectedClass = "";
+        const trainersData = {
+            "Sarah Johnson": { specialization: "Yoga & Meditation", experience: "8 years", rating: 4.9, certifications: ["RYT-500", "Meditation Instructor"], emoji: "🧘‍♀️" },
+            "Maria Garcia": { specialization: "Dance Fitness", experience: "6 years", rating: 4.8, certifications: ["Zumba Instructor", "Group Fitness"], emoji: "💃" },
+            "Mike Chen": { specialization: "Cardio & Strength", experience: "10 years", rating: 4.9, certifications: ["NASM-CPT", "CrossFit Level 2"], emoji: "🏋️" },
+            "Emma Wilson": { specialization: "Pilates & Core", experience: "7 years", rating: 4.7, certifications: ["PMA Certified", "Mat Pilates"], emoji: "🤸‍♀️" },
+            "Jake Thompson": { specialization: "HIIT & Functional", experience: "5 years", rating: 4.8, certifications: ["HIIT Specialist", "TRX Instructor"], emoji: "💪" },
+            "Lisa Park": { specialization: "Cycling & Endurance", experience: "9 years", rating: 4.9, certifications: ["Spinning Instructor", "Endurance Coach"], emoji: "🚴‍♀️" }
+        };
 
-    function sendMessage() {
-        const input = document.getElementById("input");
-        const chat = document.getElementById("chat");
-        const message = input.value.trim().toLowerCase();
+        // Navigation
+        const pages = {
+            chat: { title: "Chat Assistant", subtitle: "Ask me anything about classes, trainers, or bookings" },
+            classes: { title: "Classes", subtitle: "Browse and book your favorite fitness classes" },
+            trainers: { title: "Trainers", subtitle: "Meet our expert fitness trainers" },
+            membership: { title: "Membership", subtitle: "Manage your membership and upgrade options" }
+        };
 
-        if (message === "") return;
+        function navigateTo(page) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
 
-        chat.innerHTML += `<div class="user">${input.value}</div>`;
+            // Update page content
+            document.querySelectorAll('.page-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.add('active');
 
-        if (message === "hi" || message === "hello") {
-            chat.innerHTML += `<div class="bot">Hi! Please choose a class: Yoga, Zumba, Cardio</div>`;
+            // Update header
+            document.getElementById('pageTitle').textContent = pages[page].title;
+            document.getElementById('pageSubtitle').textContent = pages[page].subtitle;
+
+            // Load data
+            if (page === 'classes') loadClasses();
+            if (page === 'trainers') loadTrainers();
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
         }
-        else if (message === "yoga" || message === "zumba" || message === "cardio") {
-            selectedClass = message;
-            chat.innerHTML += `<div class="bot">${message.toUpperCase()} timings: 7 AM or 6 PM</div>`;
-        }
-        else if ((message.includes("am") || message.includes("pm")) && selectedClass !== "") {
-            chat.innerHTML += `<div class="bot">✅ Your ${selectedClass.toUpperCase()} class at ${message.toUpperCase()} is booked!</div>`;
-            selectedClass = "";
-        }
-        else {
-            chat.innerHTML += `<div class="bot">Sorry, I didn't understand. Please type Yoga, Zumba, or Cardio.</div>`;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
 
-        chat.scrollTop = chat.scrollHeight;
-        input.value = "";
-    }
-</script>
+        // Load Classes
+        function loadClasses() {
+            const grid = document.getElementById('classesGrid');
+            grid.innerHTML = '';
+
+            Object.entries(classesData).forEach(([key, cls]) => {
+                const percentage = (cls.enrolled / cls.capacity) * 100;
+                const difficultyClass = `difficulty-${cls.difficulty.toLowerCase()}`;
+                const trainer = trainersData[cls.trainer];
+
+                grid.innerHTML += `
+                <div class="class-card" onclick="bookClass('${key}')">
+                    <div class="class-header">
+                        <div class="class-title">
+                            <div class="class-emoji">${cls.emoji}</div>
+                            <div class="class-name">${cls.name}</div>
+                        </div>
+                        <div class="difficulty-badge ${difficultyClass}">${cls.difficulty}</div>
+                    </div>
+                    <div class="class-info">
+                        <div class="class-info-item">⏰ ${cls.timings.join(', ')}</div>
+                        <div class="class-info-item">📅 ${cls.days.join(', ')}</div>
+                        <div class="class-info-item">⏱️ ${cls.duration}</div>
+                    </div>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                        ${cls.enrolled}/${cls.capacity} enrolled
+                    </div>
+                    <div class="trainer-info">
+                        <div class="trainer-avatar">${trainer.emoji}</div>
+                        <div>
+                            <div class="trainer-name">${cls.trainer}</div>
+                            <div class="trainer-rating">⭐ ${trainer.rating}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            });
+        }
+
+        // Load Trainers
+        function loadTrainers() {
+            const grid = document.getElementById('trainersGrid');
+            grid.innerHTML = '';
+
+            Object.entries(trainersData).forEach(([name, trainer]) => {
+                grid.innerHTML += `
+                <div class="trainer-card">
+                    <div class="trainer-card-header">
+                        <div class="trainer-card-avatar">${trainer.emoji}</div>
+                        <div class="trainer-card-info">
+                            <h3>${name}</h3>
+                            <p>${trainer.specialization}</p>
+                        </div>
+                    </div>
+                    <div class="trainer-stats">
+                        <div class="stat">
+                            <div class="stat-value">⭐ ${trainer.rating}</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${trainer.experience}</div>
+                            <div class="stat-label">Experience</div>
+                        </div>
+                    </div>
+                    <div class="certifications">
+                        ${trainer.certifications.map(cert => `<span class="cert-tag">🏆 ${cert}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            });
+        }
+
+        // Book Class
+        function bookClass(classKey) {
+            navigateTo('chat');
+            document.getElementById('userInput').value = classKey;
+            sendMessage();
+        }
+
+        // Quick Actions
+        function quickAction(action) {
+            const actions = {
+                'classes': 'show me all classes',
+                'trainers': 'show trainers',
+                'membership': 'membership info',
+                'history': 'my bookings'
+            };
+            document.getElementById('userInput').value = actions[action];
+            sendMessage();
+        }
+
+        // Chat
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            typingIndicator.classList.add('active');
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                setTimeout(() => {
+                    typingIndicator.classList.remove('active');
+                    addMessage(data.reply, 'bot');
+                }, 500);
+
+            } catch (error) {
+                typingIndicator.classList.remove('active');
+                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+
+            if (sender === 'bot') {
+                messageDiv.innerHTML = `
+                <div class="bot-avatar">🤖</div>
+                <div class="bot-text">${text}</div>
+            `;
+            } else {
+                messageDiv.innerHTML = `<div class="user-text">${text}</div>`;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadClasses();
+            loadTrainers();
+            userInput.focus();
+        });
+    </script>
 
 </body>
+
 </html>
